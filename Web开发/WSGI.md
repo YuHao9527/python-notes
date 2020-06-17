@@ -107,3 +107,26 @@ start_response应该在返回可迭代对象之前调用，因为它返回的是
 
 ## 服务器端
 
+服务器端程序需要调用符合上述定义的可调用对象APP，传入environ、start_response，APP处理后，返回响应头和可迭代对象的正文，由服务器封装返回浏览器端。
+
+```python
+# 返回网页的例子
+from wsgiref.simple_server import make_server
+
+def application(environ:dict, start_response):
+    status = '200 OK'
+    headers = [('Content-type', 'text/plain; charset=utf-8')]
+
+    start_response(status, headers)
+
+    # 返回可迭代对象
+    html = '<h1>你好</h1>'.encode('utf-8')
+    return [html] # 返回要求可迭代对象，正文就是这个列表的元素，可以是一个元素一个字符串
+
+ip = '127.0.0.1'
+port = 9999
+server = make_server(ip, port, application)
+server.server_forever()
+```
+
+simple_server 只是参考用，不能用于生产。
