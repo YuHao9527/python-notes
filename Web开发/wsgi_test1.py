@@ -2,8 +2,11 @@ from wsgiref.simple_server import make_server
 
 # A relatively simple WSGI application. It's going to print out the
 # environment dictionary after being updated by setup_testing_defaults
-def simple_app(environ, start_response):
-    print(environ)
+def simple_app(environ:dict, start_response):
+    
+    for k, v in environ.items():
+        print(k, v)
+    print('-'*30)
 
     status = '200 OK'
     headers = [('Content-type', 'text/plain; charset=utf-8')]

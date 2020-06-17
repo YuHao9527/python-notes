@@ -67,7 +67,7 @@ WSGI 服务器作用
         def __init__(self, environ, statrt_response):
             pass
         def __iter__(self): # 实现此方法，对象即可迭代
-            yield res_str
+            yield from res_str
 
     # 类实现
     class Application:
@@ -91,3 +91,19 @@ environ是包含Http请求信息的dict对象
 |HTTP_HOST|地址和端口|
 |SERVER_PROTOCOL|协议|
 |HTTP_USER_AGENT|UserAgent信息|
+
+### start_response
+
+它是一个可调用对象。有3个参数，定义如下:
+`start_response(status, response_headers, exc_info=None)`
+
+status是状态码，例如`200 0K`
+
+response_headers是一个元素为二元组的列表，例如[('Content-Type','text/plain;charset=utf-8')]
+
+exc_info在错误处理的时候使用
+
+start_response应该在返回可迭代对象之前调用，因为它返回的是Response Header返回的可迭代对象是Response Body。
+
+## 服务器端
+
