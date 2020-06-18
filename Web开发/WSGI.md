@@ -121,12 +121,40 @@ def application(environ:dict, start_response):
 
     # 返回可迭代对象
     html = '<h1>你好</h1>'.encode('utf-8')
-    return [html] # 返回要求可迭代对象，正文就是这个列表的元素，可以是一个元素一个字符串
+    return [html]
 
 ip = '127.0.0.1'
 port = 9999
 server = make_server(ip, port, application)
-server.server_forever()
+server.server_forever() # server.handle_request() 一次
 ```
 
 simple_server 只是参考用，不能用于生产。
+
+测试用命令
+
+```shell
+$ curl -I http://192.168.142.1:9999/xxx?id=5
+$ curl -X POST http://192.168.142.1:9999/yyy -d '{"x":2}'
+```
+
+-I 使用HEAD方法
+-X 指定方法，-d传输数据
+
+到这里就完成了一个简单的WEB 程序开发。
+WEB服务器
+
+- 本质上就是一个TCP服务器，监听在特定端囗上
+- 支持HTTP协议，能够将HTTP请求报文进行解析，能够把响应数据进行HTTP协议的报文封装并返回浏览器端。
+- 实现了WSGI协议，该协议约定了和应用程序之间接口（参看PEP333，https://www.python.org/dev/peps/pep-0333/ ）
+
+### APP应用程序
+
+APP应用程序
+
+- 遵从WSGI协议
+- 本身是一个可调用对象
+- 调用start_response，返回响应头部
+- 返回包含正文的可迭代对象
+
+为了更好的理解WSGI框架的工作原理，现在开始动手自己写一个WEB框架。
