@@ -55,9 +55,9 @@ WSGI服务器程序处理过HTTP报文后，返回一个字典，可以得到查
     # {'name': ['tom'], 'id': [‘5’]}
     ```
 
-可以看到使用这个库，可以解析查询字符串，请注意value是列表，为什么？
-这是因为同一个key可以有多个值。
-cgi模块过期了，建议使用urlib
+    可以看到使用这个库，可以解析查询字符串，请注意value是列表，为什么？
+    这是因为同一个key可以有多个值。
+    cgi模块过期了，建议使用urlib
 
 3. 使用urlib库
 
@@ -96,3 +96,118 @@ python下，可以对WSGI请求进行解析，并提供对响应进行高级封�
 将环境参数解析并封装成request对象
 GET方法，发送的数据是URL中Query_string，在Request Header中。
 request.GET就是一个字典MultiDict，里面就封装着查询字符串。
+
+POST方法，“提交”的数据是放在Request Body里面，但是也可以同时使用Query String。
+
+request.POST可以获取Request Body中的数据，也是个字典MultiDict。
+
+不关心什么方法提交，只关心数据，可以使用request.params，它里面是所有提交数据的封装。
+
+```py
+request = webob.Request(environ)
+print(request.method)
+print(request.query_string) # 查询字符串
+print(request.GET) # dict GET方法的所有数据
+print(type(request.GET))
+print(request.POST) # dict POST方法所有数据
+print(request.path) # 路径
+print(f'params = {request.params}') # 所有数据，参数
+print(request.headers) # 请求头 类字典容器
+```
+
+### MultiDict
+
+MulitiDict（多值字典）允许一个key存好几个值。
+
+```py
+from webob.multidict import MultiDict
+
+md = MultiDict()
+
+md.add('a', 1)
+md.add('b', 2)
+md.add('b', '3')
+md['a'] = '4'
+
+for pair in md.items():
+    print(pair)
+
+print(md.get('a'))
+print(md.getall('b')) # 返回所有值
+# print(md.getone('a')) # 只能有一个值
+print(md.get('b')) # 返回一个值
+print(md.get('c')) # 不会抛出异常KeyError，返回None
+```
+
+### webob.Response对象
+
+```py
+res = webob.Response
+print(res.status)
+print(res.headerlist)
+start_response(res.status, res.headerlist)
+# 返回可迭代对象
+html = '<h1>你好</h1>'.encode()
+return [html]
+```
+
+如果一个Application是一个类的实例，可以实现__call__方法。
+来看看webob.Response类的源代码
+
+```py
+def __call__(self, environ, start_response):
+        """
+        WSGI application interface
+        """
+        if self.conditional_response:
+            return self.conditional_response_app(environ, start_response)
+
+        headerlist = self._abs_headerlist(environ)
+
+        start_response(self.status, headerlist)
+        if environ['REQUEST_METHOD'] == 'HEAD':
+            # Special case here...
+            return EmptyResponse(self._app_iter)
+        return self._app_iter
+```
+
+由此可得到下面代码
+
+```py
+def application(environ:dict, start_response):
+    # 请求处理
+    request = webob.Request(environ)
+    print(request.method)
+    print(request.path)
+    print(request.query_string)
+    print(request.GET)
+    print(request.POST)
+    print(f'params = {request.params}')
+
+    # 响应处理
+    res = webob.Response() # [('Content-type', 'text/plain; charset=utf-8')]
+    res.status_code = 200 # 默认200
+    print(res.content_type)
+    html = '<h1>你好</h1>'.encode()
+    res.body = html
+    return res(environ, start_response)
+```
+
+### webob.dec 装饰器
+
+wsgify装饰器
+[文档](https://docs.pylonsproject.org/projects/webob/en/stable/api/dect.html)
+
+`class webob.dec.wsgify(fun=None, RequestClass=None, args=(), kwargs=None, middleware_wraps=None`
+
+要求提供类似下面的可调用对象，以函数举例：
+
+```py
+from webob.dec import wsgify
+
+@wsgify
+def app(request:webob.Request) -> webob.Response:
+    res = webob.Response('<h1>你好</h1>')
+    return res
+```
+
