@@ -1,4 +1,5 @@
 from wsgiref.simple_server import make_server
+from urllib.parse import parse_qs
 
 # A 127.0.0.1:9000?id=1&name=tome&age=20
 # 127.0.0.1:9000?id=1&name=tome,jerry&age=20&age=30
