@@ -1,8 +1,7 @@
-import cgi
-
 from wsgiref.simple_server import make_server
 
 # A 127.0.0.1:9000?id=1&name=tome&age=20
+# 127.0.0.1:9000?id=1&name=tome,jerry&age=20&age=30
 def simple_app(environ:dict, start_response):
     # 查询字符串
     query_string = environ.get('QUERY_STRING')
@@ -14,7 +13,7 @@ def simple_app(environ:dict, start_response):
     
     # d = {k:v for k,_,v in map(lambda x: x.partition('='), query_string.split('&'))}
 
-    qs = cgi.parse_qs(query_string)
+    qs = parse_qs(query_string)
     print(qs)
     status = '200 OK'
     headers = [('Content-type', 'text/plain; charset=utf-8')]
