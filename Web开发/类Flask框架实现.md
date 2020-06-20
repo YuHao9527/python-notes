@@ -210,4 +210,3 @@ def app(request:webob.Request) -> webob.Response:
     res = webob.Response('<h1>你好</h1>')
     return res
 ```
-
