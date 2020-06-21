@@ -37,11 +37,17 @@ def simple_app(environ:dict, start_response):
 def app(request:Request) -> Response: # 一个请求对应一个响应
     return Response('<h1>fateGod</h1>')
 
-with make_server('0.0.0.0', 9000, app) as httpd: # 创建server
-    try:
-        httpd.serve_forever()
-    except Exception as e:
-        print(e)
-    except KeyboardInterrupt:
-        print('stop')
-        httpd.serve_close()
+class App:
+    @wsgify
+    def __call__(self, request:Request):
+        return Response('<h1>fateGod</h1>')
+
+if __name__ == "__main__":
+    with make_server('0.0.0.0', 9000, App()) as httpd: # 创建server
+        try:
+            httpd.serve_forever()
+        except Exception as e:
+            print(e)
+        except KeyboardInterrupt:
+            print('stop')
+            httpd.serve_close()
