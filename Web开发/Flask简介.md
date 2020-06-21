@@ -27,3 +27,12 @@ Flask常用扩展包：
 
 1. 中文文档(https://dormousehole.readthedocs.io/en/latest/)
 2. 英文文档(https://flask.palletsprojects.com/en/1.1.x/)
+
+## Django与Flask之间的差别
+
+- Django功能大而全，Flask只包含基本的配置
+Django一站式解决的思路，能让开发者不用在开发之前就在选择应用的基础设施上花费大时间。
+Django有模板，表单，路由，认证，基本的数据库管理等等内建功能。与之相反，Flask只是一个内核，默认依赖于两个外部库： Jinja2模板引擎和Werkzeug WSGI工具集，其他很多功能都是以扩展的形式进行嵌入使用。
+- Flask 比 Django 更灵活
+- Flask 在 Django 之后发布，现阶段有大量的插件和扩屐满足不同需要
+- Django发布于2005年，Flask创始于2010年年中。
