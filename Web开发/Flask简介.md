@@ -10,9 +10,9 @@ Python最出名的框架要数Django。此外还有Flask、Tornado等框架。�
 
 Flask常用扩展包：
 
-- Flask_SQLalchemy: 操作数据库；
-- Flask_migrate: 管理迁移数据库；
-- Flask_Mail: 邮件；
+- Flask-SQLalchemy: 操作数据库；
+- Flask-migrate: 管理迁移数据库；
+- Flask-Mail: 邮件；
 - Flask-WTF: 表单；
 - Flask-Bable: 提供国际化和本地化支時，翻译；
 - Flask-script: 插入脚本；
