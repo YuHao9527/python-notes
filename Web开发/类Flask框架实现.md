@@ -210,3 +210,67 @@ def app(request:webob.Request) -> webob.Response:
     res = webob.Response('<h1>你好</h1>')
     return res
 ```
+
+```
+wsgify装饰器装饰的函数应该具有一个参数，这个参数是webob.Request类型，是对字典environ的对象化后的实例。
+
+返回值
+可以是一个webob.Response类型实例
+可以是一个bytes类型实例，它会被封装成webob.Response类型实例的body属性
+可以是一个字符串类型实例，它会被转换成bytes类型实例，然后会被封装成webob.Response类型实例的
+body属性
+总之，返回值会被封装成webob.Response类型实例返回
+```
+
+由此修改测试代码，如下
+
+```py
+import webob
+from wsgiref.simple_server import make_server
+from webob.dec import wsgify
+
+@wsgify
+def app(request:webob.Request) -> webob.Response: # 一个请求对应一个响应
+    print(request.method)
+    print(request.path)
+    print(request.query_string)
+    print(request.GET)
+    print(request.POST)
+    print(f'params = {request.params}')
+    return webob.Response('<h1>你好</h1>')
+
+if __name__ == __main__:
+    ip = '127.0.0.1'
+    port = 9999
+    with make_server(ip, port, app) as httpd:
+        try:
+            httpd.server_forver() # httpd.handle_request() 一次
+        except KeyboardInterrupt:
+            server.shutdown()
+            server.server_close()
+```
+
+将上面的app函数封装成类
+
+```py
+import webob
+from wsgiref.simple_server import make_server
+from webob.dec import wsgify
+
+class App:
+    @wsgify
+    def __call__(self, request:Request):
+        return Response('<h1>你好</h1>')
+
+if __name__ == __main__:
+    ip = '127.0.0.1'
+    port = 9999
+    with make_server(ip, port, app) as httpd:
+        try:
+            httpd.server_forver() # httpd.handle_request() 一次
+        except KeyboardInterrupt:
+            server.shutdown()
+            server.server_close()
+```
+
+上面的代码中，所有请求，都有这个App类的实例处理，需要对它进行改造。
