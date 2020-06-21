@@ -25,5 +25,5 @@ Flask常用扩展包：
 
 `扩展列表： http://flask.pocoo.org/extensions/`
 
-1. 中文文档(http://docs.jinkan.org/docs/flask/)
-2. 英文文档(http://flask.pocoo.org/docs/0.12/)
+1. 中文文档(https://dormousehole.readthedocs.io/en/latest/)
+2. 英文文档(https://flask.palletsprojects.com/en/1.1.x/)
