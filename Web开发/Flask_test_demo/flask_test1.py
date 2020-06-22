@@ -13,10 +13,22 @@ app = Flask(__name__)
 
 # 3. 定义路由及视图函数
 # Flask中定义路由是通过装饰器实现的
-@app.route('/')
+# 路由默认只支持GET方法，如果需要增加，需要自行指定
+@app.route('/', methods=['GET', 'POST'])
 def index():
     return 'Hello, Flask'
     # return render_template('index.html')
+
+# 使用同一个视图函数，来显示不同用户的订单信息
+# <>定义路由的参数，<>内需要起个名字
+@app.route('/orders/<int:order_id>')
+def get_order_id(order_id):
+    # 参数类型，默认是字符串，Unicode
+    print(type(order_id))
+
+    # 有时候，需要对路由做访问优化。订单ID应该是int类型
+
+    return 'order_id %d' % order_id
 
 # 4. 启动程序
 if __name__ == '__main__':
