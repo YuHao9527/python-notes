@@ -6,5 +6,44 @@
 </head>
 <body>
 <h1>Hello HTML</h1>
+这是模板 <br>
+这是首页 <br>
+
+{#下面是一个变量代码块的使用#}
+{{ url_str }} <br>
+
+{#下面是列表的传输使用#}
+{{ my_list }} <br>
+{{ my_list.2 }} <br>
+{{ my_list[2] }} <br>
+
+{#字典的使用#}
+{{ my_dict }} <br>
+{{ my_dict.url}} <br>
+{{ my_dict['url']}} <br>
+
+<hr>
+
+{#控制代码块 {%  %}#}
+
+{#For循环的使用，建议先写for，然后按住tab进行补全#}
+{% for num in my_list %}
+    {#数据大于3，才能显示#}
+    {% if num > 3 %}
+        {{ num }} <br>
+    {% endif %}
+{% endfor %}
+
+<hr>
+
+{#过滤器#}
+
+{#字符串大写#}
+{{ url_str | upper }} <br>
+{#字符串反转#}
+{{ url_str | reverse}} <br>
+{#过滤器链式调用#}
+{{ url_str | upper | reverse}} <br>
+
 </body>
 </html>

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/6/22 13:41
 # @Author  : YuHao
-# @File    : flask_test1.py
+# @File    : flask_WTF_demo.py
 
 # 1. 导入Flask扩展
 from flask import Flask, render_template
