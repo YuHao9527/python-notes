@@ -325,9 +325,10 @@ form表单。
 
 ```jinja2
 <form method="post">
-    <lael>用户名:</lael><input type="text" name="username"><br>
-    <label>密码:</label><input type="text" name="password"><br>
-    <label>确认密码:</label><input type="text" name="password2"><br>
+    <label>用户名:</label><input type="text" name="username"><br>
+    <label>密码:</label><input type="password" name="password"><br>
+    <label>确认密码:</label><input type="password" name="password2"><br>
+    <input type="submit" value="提交"><br>
     {% for message in get_flashed_message() %}
         {{ message }}
     {% endfor %}
@@ -365,3 +366,135 @@ def hello_world():
 
 ##### 使用Flask-WTF实现表单
 
+###### 模板页面：
+
+```jinja2
+<form method="post" ">
+    {#设置csrf_token#}
+    {{ form.csrf_token() }}
+    {{ form.username.label }}{{ form.username }}<br>
+    {{ form.password.label }}{{ form.password }}<br>
+    {{ form.password2.label }}{{ form.password2 }}<br>
+    {{ form.submit }}
+</form>
+```
+
+###### 视图函数：
+
+```python
+from flask import Flask, render_template, request, flash
+
+# 导入WTF扩展的表单类
+from flask_wtf import FlaskForm
+
+# 导入自定义表单需要的字符类
+from wtforms import StringField, PasswordField, SubmitField
+
+# 导入WTF扩展提供的表单验证数据
+from wtforms.validators import DataRequired, EqualTo
+
+app = Flask(__name__)
+
+app.secret_key = 'yuhao'
+
+# 自定义表单类，文本字符，密码字段，提交按钮
+# 需要自定义一个表单类
+class LoginForm(FlaskForm):
+    username = StringField('用户名:', validators=[DataRequired()])
+    password = PasswordField('密码:', validators=[DataRequired()])
+    password2 = PasswordField('确认密码:', validators=[DataRequired(), EqualTo('password', '密码不一致')])
+    submit = SubmitField('提交')
+
+# 定义根路由视图函数，生成表单对象，获取表单数据，进行表单数据验证
+@app.route('/form', methods=['GET', 'POST'])
+def login():
+    login_form = LoginForm()
+    # 1. 判断请求方式
+    if request.method == 'POST':
+        # 2. 获取请求的参数
+        username = request.form.get('username')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+
+        # 3. 验证参数，WTF可以一句话就实现所有的校验
+        if login_form.validate_on_submit():
+            print(username, password, password2)
+            return 'success'
+        else:
+            flash('参数有误')
+    return render_template('index.html', form=login_form)
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    # request: 请求对象 --> 获取请求方式、数据
+
+    # 1. 判断请求方式
+    if request.method == 'POST':
+        # 2. 获取请求参数
+        username = request.form.get('username')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+        print(username, password, password2)
+        # 3. 判断参数是否填写 & 密码是否完整
+        if not all([username, password, password2]):
+            # print('参数不完整')
+            flash('参数不完整')
+        elif password != password2:
+            # print('密码不一致')
+            flash('密码不一致')
+        # 4. 返回success
+        else:
+            return 'success'
+
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+## Flask中使用数据库
+
+### Flask-SQLAlchemy扩展
+
+- SQLALchemy实际上是对数据库的抽象，让开发者不用直接和SQL语句打交道，而是通过Python对象来操作数据库，在舍弁一些性能开销的同时，换来的是开发效率的较大提升
+- SQLAlchemy是一个关系型数据厍架，它提供了高层的ORM和底层的原生数据库的操作。flask-sqlalchemy是一个简化了SQLAlchemy操作的flask扩展。
+
+### 安装flask-sqlalchemy
+
+`pip instatt flask—sqlalchemy`
+
+如果连接的是mysql数据库，需要安装mysqldb
+
+`pip install flask—mysqldb`
+
+### 使用FIask-SQLAlchemy管理数据库
+
+在Flask-SOLAlchemy中,数据厍使用URL指定，而且程序使用的数据库必须保存到Flask配置对象的SQLALCHEMY_DATABASE_URI键中。
+
+#### Flask的数据库设置：
+
+`app.config['SQLALCHEMY_DATABASE_URI`] = 'mysql://root:mysql@127.0.0.1:3306/test'
+
+##### 其他设置：
+
+```python
+# 动态追踪修改设置，如未设置只会提示警告，不建议开启
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# 查询时会显示原始SQL语句
+app.config['SQLALCHEMY_ECHO'] = True
+```
+
+名字|备注
+---|---
+SQLALCHEMY_DATABASE_URI|用于连接的数库URI 。例如:sqlite:////tmp/test.dbmysql://username:password@server/db
+SQLALCHEMY_BINDS|一个映射binds到连接URI的字興。更多binds的信息见用Binds 操作多个数据库。
+SQLALCHEMY_ECHO|如果设置为Ture，SOLAlchemy会记录所有发给stderr的语句，这对调试有用，(打印sql语句)
+SQLALCHEMY_RECORD_QUERIES|可以用于显式地禁用或启用查询记录。查询记录在调试测试模式自动启用。更多信息见get_debug_queries()。
+SQLALCHEMY_NATIVE_UNICODE|可以用于显式禁用原生unicode 支持。当使用不合适的指定无编码的数据库默认值时，这对于一些据库适配器是必须的（比如Ubuntu上某些版本的PostgreSQL ）。
+SQLALCHEMY_POOL—SIZE|数据库连接池的大小。默认是引擎默认值（通常是5）
+SQLALCHEMY_POOL_TIMEOUT|设定连接池的连接超时时间, 默认是10
+SQLALCHEMY_POOL_RECYCLE|多少秒后自动回收连接，这对MySQL是必要的，它默认移除闲置多于8小的连接。注意如果使用了MySQLFlask-SQLALchemy自动设定这个值为2小时。
+
+#### 常用的SQLAlchemy字段类型
